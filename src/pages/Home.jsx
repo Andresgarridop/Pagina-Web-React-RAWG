@@ -1,0 +1,160 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Star, Search, Calendar, Info } from "lucide-react";
+
+import Carousel from "../components/Carousel";
+import HeroSlider from "../components/HeroSlider";
+import { getPopularGames, getTopMetacriticGames } from "../services/rawg";
+
+export default function Home() {
+  const [heroGames, setHeroGames] = useState([]);
+  const [popular, setPopular] = useState([]);
+
+  const [loadingHero, setLoadingHero] = useState(true);
+  const [loadingPopular, setLoadingPopular] = useState(true);
+
+  const [errorHero, setErrorHero] = useState("");
+  const [errorPopular, setErrorPopular] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      try {
+        setLoadingHero(true);
+        setErrorHero("");
+        const data = await getTopMetacriticGames({ pageSize: 8 });
+        if (!alive) return;
+        setHeroGames(data.results || []);
+      } catch {
+        if (!alive) return;
+        setErrorHero("No se pudo cargar el slider de videojuegos destacados.");
+      } finally {
+        if (!alive) return;
+        setLoadingHero(false);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      try {
+        setLoadingPopular(true);
+        setErrorPopular("");
+        const data = await getPopularGames({ pageSize: 12 });
+        if (!alive) return;
+        setPopular(data.results || []);
+      } catch {
+        if (!alive) return;
+        setErrorPopular("No se pudieron cargar los videojuegos populares.");
+      } finally {
+        if (!alive) return;
+        setLoadingPopular(false);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  return (
+    <div>
+      {/* HERO SLIDER */}
+      {loadingHero && (
+        <p className="max-w-6xl mx-auto px-4 py-10 text-slate-400">
+          Cargando videojuegos destacados…
+        </p>
+      )}
+
+      {errorHero && (
+        <p className="max-w-6xl mx-auto px-4 py-10 text-red-400">
+          {errorHero}
+        </p>
+      )}
+
+      {!loadingHero && !errorHero && (
+        <HeroSlider items={heroGames} />
+      )}
+
+      {/* SECCIÓN PROMOCIONAL */}
+      <section className="py-24 border-b border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 grid gap-14 lg:grid-cols-2 items-center">
+          <div>
+            <p className="text-sm text-indigo-400 font-semibold uppercase tracking-wide">
+              Plataforma de videojuegos
+            </p>
+
+            <h1 className="mt-4 text-4xl sm:text-5xl font-extrabold leading-tight">
+              Descubre, busca y explora
+              <br />
+              los mejores videojuegos
+            </h1>
+
+            <p className="mt-6 text-lg text-slate-300">
+              Accede a una base de datos completa de videojuegos, consulta
+              valoraciones, fechas de lanzamiento y descubre títulos destacados
+              de todas las plataformas.
+            </p>
+
+            <div className="mt-10">
+              <Link
+                to="/games"
+                className="inline-flex px-7 py-3.5 rounded-2xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-semibold transition"
+              >
+                Explorar videojuegos
+              </Link>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/40 p-10">
+            <ul className="space-y-5 text-slate-300">
+              <li className="flex items-center gap-4">
+                <Star className="w-5 h-5 text-indigo-300" />
+                Videojuegos destacados y mejor valorados
+              </li>
+              <li className="flex items-center gap-4">
+                <Search className="w-5 h-5 text-indigo-300" />
+                Búsqueda rápida por nombre
+              </li>
+              <li className="flex items-center gap-4">
+                <Calendar className="w-5 h-5 text-indigo-300" />
+                Fechas de lanzamiento y puntuaciones
+              </li>
+              <li className="flex items-center gap-4">
+                <Info className="w-5 h-5 text-indigo-300" />
+                Información detallada de cada videojuego
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* CARRUSEL DE POPULARES */}
+      {loadingPopular && (
+        <p className="max-w-6xl mx-auto px-4 py-12 text-slate-400">
+          Cargando videojuegos populares…
+        </p>
+      )}
+
+      {errorPopular && (
+        <p className="max-w-6xl mx-auto px-4 py-12 text-red-400">
+          {errorPopular}
+        </p>
+      )}
+
+      {!loadingPopular && !errorPopular && (
+        <Carousel
+          title="Videojuegos más populares"
+          items={popular}
+        />
+      )}
+    </div>
+  );
+}
