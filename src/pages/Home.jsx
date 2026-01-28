@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { Star, Search, Calendar, Info } from "lucide-react";
 
 import Carousel from "../components/Carousel";
 import HeroSlider from "../components/HeroSlider";
+import Button from "../components/ui/Button";
+import Loading from "../components/ui/Loading";
+import ErrorMessage from "../components/ui/ErrorMessage";
 import { getPopularGames, getTopMetacriticGames } from "../services/rawg";
 
 export default function Home() {
@@ -67,17 +69,9 @@ export default function Home() {
   return (
     <div>
       {/* HERO SLIDER */}
-      {loadingHero && (
-        <p className="max-w-6xl mx-auto px-4 py-10 text-slate-400">
-          Cargando videojuegos destacados…
-        </p>
-      )}
+      {loadingHero && <Loading message="Cargando videojuegos destacados…" />}
 
-      {errorHero && (
-        <p className="max-w-6xl mx-auto px-4 py-10 text-red-400">
-          {errorHero}
-        </p>
-      )}
+      {errorHero && <ErrorMessage message={errorHero} />}
 
       {!loadingHero && !errorHero && (
         <HeroSlider items={heroGames} />
@@ -104,12 +98,9 @@ export default function Home() {
             </p>
 
             <div className="mt-10">
-              <Link
-                to="/games"
-                className="inline-flex px-7 py-3.5 rounded-2xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-semibold transition"
-              >
+              <Button to="/games" variant="primary">
                 Explorar videojuegos
-              </Link>
+              </Button>
             </div>
           </div>
 
@@ -137,17 +128,9 @@ export default function Home() {
       </section>
 
       {/* CARRUSEL DE POPULARES */}
-      {loadingPopular && (
-        <p className="max-w-6xl mx-auto px-4 py-12 text-slate-400">
-          Cargando videojuegos populares…
-        </p>
-      )}
+      {loadingPopular && <Loading message="Cargando videojuegos populares…" />}
 
-      {errorPopular && (
-        <p className="max-w-6xl mx-auto px-4 py-12 text-red-400">
-          {errorPopular}
-        </p>
-      )}
+      {errorPopular && <ErrorMessage message={errorPopular} />}
 
       {!loadingPopular && !errorPopular && (
         <Carousel

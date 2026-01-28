@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Calendar,
@@ -11,6 +10,11 @@ import {
   ExternalLink,
 } from "lucide-react";
 
+import Badge from "../components/ui/Badge";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Loading from "../components/ui/Loading";
+import ErrorMessage from "../components/ui/ErrorMessage";
 import { getGameDetails } from "../services/rawg";
 import { isFavorite, toggleFavorite } from "../services/favorites";
 
@@ -19,7 +23,7 @@ function stripHtml(html = "") {
 }
 
 export default function GameDetail() {
-  const { id } = useParams();
+  const id = window.location.pathname.split("/").pop();
 
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -80,7 +84,7 @@ export default function GameDetail() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <p className="text-slate-400">Cargando videojuego…</p>
+        <Loading message="Cargando videojuego…" />
       </div>
     );
   }
@@ -88,14 +92,11 @@ export default function GameDetail() {
   if (error || !game) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <p className="text-red-400">{error || "No encontrado"}</p>
-        <Link
-          to="/games"
-          className="inline-flex items-center gap-2 mt-6 px-5 py-3 rounded-2xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900 transition text-sm font-semibold"
-        >
+        <ErrorMessage message={error || "No encontrado"} />
+        <Button to="/games" className="mt-6">
           <ArrowLeft className="w-4 h-4" />
           Volver a videojuegos
-        </Link>
+        </Button>
       </div>
     );
   }
@@ -118,13 +119,10 @@ export default function GameDetail() {
           <div className="relative max-w-6xl mx-auto px-4 pt-10 pb-10 min-h-[62vh]">
             {/* BACK arriba */}
             <div className="flex items-center justify-between">
-              <Link
-                to="/games"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900 transition text-sm font-semibold"
-              >
+              <Button to="/games" className="text-sm">
                 <ArrowLeft className="w-4 h-4" />
                 Volver al catálogo
-              </Link>
+              </Button>
             </div>
 
             {/* Contenido principal */}
@@ -136,31 +134,19 @@ export default function GameDetail() {
 
                 {/* Chips */}
                 <div className="mt-6 flex flex-wrap items-center gap-2 text-sm sm:text-base">
-                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-950/60 border border-slate-800">
-                    <Calendar className="w-4 h-4 text-indigo-300" />
-                    {released}
-                  </span>
-
-                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-950/60 border border-slate-800">
-                    <Star className="w-4 h-4 text-indigo-300" />
-                    {rating}
-                  </span>
-
-                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-950/60 border border-slate-800">
-                    <Trophy className="w-4 h-4 text-indigo-300" />
-                    Metacritic: {meta}
-                  </span>
+                  <Badge icon={Calendar}>{released}</Badge>
+                  <Badge icon={Star}>{rating}</Badge>
+                  <Badge icon={Trophy}>Metacritic: {meta}</Badge>
                 </div>
 
                 {/* Acciones (aquí encaja perfecto favoritos) */}
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                   <button
                     onClick={handleToggleFav}
-                    className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl border transition text-sm font-semibold ${
-                      fav
-                        ? "bg-pink-500/20 border-pink-400 text-pink-300 hover:bg-pink-500/25"
-                        : "bg-slate-950/40 border-slate-800 text-slate-200 hover:bg-slate-900"
-                    }`}
+                    className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl border transition text-sm font-semibold ${fav
+                      ? "bg-pink-500/20 border-pink-400 text-pink-300 hover:bg-pink-500/25"
+                      : "bg-slate-950/40 border-slate-800 text-slate-200 hover:bg-slate-900"
+                      }`}
                     aria-label={fav ? "Quitar de favoritos" : "Añadir a favoritos"}
                     title={fav ? "Quitar de favoritos" : "Añadir a favoritos"}
                   >
@@ -169,15 +155,10 @@ export default function GameDetail() {
                   </button>
 
                   {game.website && (
-                    <a
-                      href={game.website}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900 transition text-sm font-semibold"
-                    >
+                    <Button href={game.website} target="_blank" rel="noreferrer" className="text-sm">
                       Web oficial
                       <ExternalLink className="w-4 h-4" />
-                    </a>
+                    </Button>
                   )}
                 </div>
 
@@ -185,13 +166,9 @@ export default function GameDetail() {
                 {genres.length > 0 && (
                   <div className="mt-6 flex flex-wrap gap-2">
                     {genres.map((g) => (
-                      <span
-                        key={g}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-xl border border-slate-800 bg-slate-950/30 text-slate-200 text-sm"
-                      >
-                        <Tag className="w-4 h-4 text-indigo-300" />
+                      <Badge key={g} icon={Tag} className="bg-slate-950/30">
                         {g}
-                      </span>
+                      </Badge>
                     ))}
                   </div>
                 )}
@@ -228,16 +205,16 @@ export default function GameDetail() {
       {/* CONTENIDO */}
       <section className="max-w-6xl mx-auto px-4 py-12 grid gap-8 lg:grid-cols-12">
         <div className="lg:col-span-8">
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/30 p-8">
+          <Card>
             <h2 className="text-xl font-bold">Descripción</h2>
             <p className="mt-4 text-slate-300 leading-relaxed whitespace-pre-line">
               {description || "No hay descripción disponible para este juego."}
             </p>
-          </div>
+          </Card>
         </div>
 
         <div className="lg:col-span-4">
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/30 p-8">
+          <Card>
             <h2 className="text-xl font-bold">Detalles</h2>
 
             <div className="mt-5 space-y-4 text-sm text-slate-300">
@@ -263,13 +240,13 @@ export default function GameDetail() {
                 </span>
               </div>
             </div>
-          </div>
+          </Card>
 
           {game.esrb_rating?.name && (
-            <div className="mt-6 rounded-3xl border border-slate-800 bg-slate-900/30 p-8">
+            <Card className="mt-6">
               <h2 className="text-xl font-bold">Clasificación</h2>
               <p className="mt-4 text-slate-300">{game.esrb_rating.name}</p>
-            </div>
+            </Card>
           )}
         </div>
       </section>

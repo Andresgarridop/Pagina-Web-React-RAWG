@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
 import GameCard from "../components/GameCard";
+import GameFilters from "../components/GameFilters";
+import Pagination from "../components/Pagination";
+import Loading from "../components/ui/Loading";
+import ErrorMessage from "../components/ui/ErrorMessage";
 import { getGamesList, getGenres, getPlatforms } from "../services/rawg";
 
 const PAGE_SIZE = 40;
@@ -111,16 +114,6 @@ export default function Games() {
         return Math.max(1, Math.ceil(count / PAGE_SIZE));
     }, [count]);
 
-    const pagesToShow = useMemo(() => {
-        const max = 5;
-        const start = Math.max(1, page - 2);
-        const end = Math.min(totalPages, start + max - 1);
-        const realStart = Math.max(1, end - max + 1);
-
-        const arr = [];
-        for (let i = realStart; i <= end; i++) arr.push(i);
-        return arr;
-    }, [page, totalPages]);
 
     const clearFilters = () => {
         setSearchInput("");
@@ -137,117 +130,47 @@ export default function Games() {
                 <div>
                     <h1 className="text-4xl font-extrabold">Explora Videojuegos</h1>
                     <p className="mt-2 text-slate-400">
-                      Desde clásicos legendarios hasta los lanzamientos más recientes, todo en un solo lugar.
+                        Desde clásicos legendarios hasta los lanzamientos más recientes, todo en un solo lugar.
                     </p>
 
                 </div>
 
+
                 {/* Barra de búsqueda + filtros */}
-                <div className="rounded-3xl border border-slate-800 bg-slate-900/30 p-5">
-                    <div className="grid gap-4 lg:grid-cols-12 items-center">
-                        <div className="lg:col-span-6">
-                            <label className="text-sm text-slate-300">Buscar por nombre</label>
-                            <div className="mt-2 flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-950/40 px-3 py-2">
-                                <Search className="w-5 h-5 text-slate-400" />
-                                <input
-                                    value={searchInput}
-                                    onChange={(e) => setSearchInput(e.target.value)}
-                                    placeholder="Ej: The Witcher, GTA, Zelda…"
-                                    className="w-full bg-transparent outline-none text-slate-100 placeholder:text-slate-500"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="lg:col-span-2">
-                            <label className="text-sm text-slate-300">Ordenar</label>
-                            <select
-                                value={ordering}
-                                onChange={(e) => {
-                                    setOrdering(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="mt-2 w-full rounded-2xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-slate-100 outline-none"
-                            >
-                                {ORDER_OPTIONS.map((o) => (
-                                    <option key={o.value} value={o.value}>
-                                        {o.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="lg:col-span-2">
-                            <label className="text-sm text-slate-300">Género</label>
-                            <select
-                                value={genre}
-                                onChange={(e) => {
-                                    setGenre(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="mt-2 w-full rounded-2xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-slate-100 outline-none"
-                                disabled={loadingFilters}
-                            >
-                                <option value="">Todos</option>
-                                {genres.map((g) => (
-                                    <option key={g.id} value={g.slug}>
-                                        {g.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="lg:col-span-2">
-                            <label className="text-sm text-slate-300">Plataforma</label>
-                            <select
-                                value={platform}
-                                onChange={(e) => {
-                                    setPlatform(e.target.value);
-                                    setPage(1);
-                                }}
-                                className="mt-2 w-full rounded-2xl border border-slate-800 bg-slate-950/40 px-3 py-2 text-slate-100 outline-none"
-                                disabled={loadingFilters}
-                            >
-                                <option value="">Todas</option>
-                                {platforms.map((p) => (
-                                    <option key={p.id} value={p.id}>
-                                        {p.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="mt-4 flex flex-wrap items-center gap-3">
-                        <button
-                            onClick={clearFilters}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900 transition text-sm font-semibold"
-                        >
-                            <SlidersHorizontal className="w-4 h-4 text-indigo-300" />
-                            Limpiar filtros
-                        </button>
-
-                        <div className="text-sm text-slate-400">
-                            {count ? (
-                                <>
-                                    Mostrando página <span className="text-slate-200 font-semibold">{page}</span> de{" "}
-                                    <span className="text-slate-200 font-semibold">{totalPages}</span> —{" "}
-                                    <span className="text-slate-200 font-semibold">{count}</span> resultados
-                                </>
-                            ) : (
-                                "—"
-                            )}
-                        </div>
-                    </div>
-                </div>
+                <GameFilters
+                    searchInput={searchInput}
+                    onSearchChange={(value) => {
+                        setSearchInput(value);
+                    }}
+                    ordering={ordering}
+                    onOrderingChange={(value) => {
+                        setOrdering(value);
+                        setPage(1);
+                    }}
+                    genre={genre}
+                    onGenreChange={(value) => {
+                        setGenre(value);
+                        setPage(1);
+                    }}
+                    platform={platform}
+                    onPlatformChange={(value) => {
+                        setPlatform(value);
+                        setPage(1);
+                    }}
+                    genres={genres}
+                    platforms={platforms}
+                    loadingFilters={loadingFilters}
+                    onClearFilters={clearFilters}
+                    count={count}
+                    currentPage={page}
+                    totalPages={totalPages}
+                    orderOptions={ORDER_OPTIONS}
+                />
 
                 {/* Estado */}
-                {loading && (
-                    <p className="text-slate-400">Cargando videojuegos…</p>
-                )}
+                {loading && <Loading message="Cargando videojuegos…" />}
 
-                {error && (
-                    <p className="text-red-400">{error}</p>
-                )}
+                {error && <ErrorMessage message={error} />}
 
                 {!loading && !error && games.length === 0 && (
                     <p className="text-slate-400">No hay resultados con esos filtros.</p>
@@ -264,66 +187,12 @@ export default function Games() {
 
                 {/* Paginación */}
                 {!loading && !error && count > 0 && (
-                    <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-                        <div className="text-sm text-slate-400">
-                            {PAGE_SIZE} juegos por página
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-2">
-                            <button
-                                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                disabled={page <= 1}
-                                className="px-4 py-2 rounded-2xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900 transition text-sm font-semibold disabled:opacity-40 disabled:hover:bg-slate-950/40"
-                            >
-                                Anterior
-                            </button>
-
-                            {pagesToShow[0] > 1 && (
-                                <>
-                                    <button
-                                        onClick={() => setPage(1)}
-                                        className="px-4 py-2 rounded-2xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900 transition text-sm font-semibold"
-                                    >
-                                        1
-                                    </button>
-                                    <span className="px-2 text-slate-500">…</span>
-                                </>
-                            )}
-
-                            {pagesToShow.map((p) => (
-                                <button
-                                    key={p}
-                                    onClick={() => setPage(p)}
-                                    className={`px-4 py-2 rounded-2xl border text-sm font-semibold transition ${p === page
-                                            ? "bg-indigo-500 border-indigo-400 text-slate-950"
-                                            : "border-slate-800 bg-slate-950/40 hover:bg-slate-900 text-slate-100"
-                                        }`}
-                                >
-                                    {p}
-                                </button>
-                            ))}
-
-                            {pagesToShow[pagesToShow.length - 1] < totalPages && (
-                                <>
-                                    <span className="px-2 text-slate-500">…</span>
-                                    <button
-                                        onClick={() => setPage(totalPages)}
-                                        className="px-4 py-2 rounded-2xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900 transition text-sm font-semibold"
-                                    >
-                                        {totalPages}
-                                    </button>
-                                </>
-                            )}
-
-                            <button
-                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                disabled={page >= totalPages}
-                                className="px-4 py-2 rounded-2xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900 transition text-sm font-semibold disabled:opacity-40 disabled:hover:bg-slate-950/40"
-                            >
-                                Siguiente
-                            </button>
-                        </div>
-                    </div>
+                    <Pagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        onPageChange={setPage}
+                        itemsPerPage={PAGE_SIZE}
+                    />
                 )}
             </div>
         </div>
