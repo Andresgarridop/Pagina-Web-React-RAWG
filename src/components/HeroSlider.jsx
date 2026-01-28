@@ -40,17 +40,17 @@ export default function HeroSlider({ items = [] }) {
 
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/30" />
 
-        <div className="relative h-full max-w-6xl mx-auto px-6 pt-10 pb-24 grid lg:grid-cols-2 items-end">
+        <div className="relative h-full max-w-7xl mx-auto px-6 pt-10 pb-24 grid lg:grid-cols-2 items-end">
           <div>
-            <p className="text-sm text-indigo-300 font-semibold uppercase tracking-wide">
+            <p className="text-indigo-300 font-semibold uppercase tracking-wide" style={{ fontSize: 'clamp(0.75rem, 1vw, 1rem)' }}>
               Clásicos y top valorados
             </p>
 
-            <h2 className="mt-4 text-5xl sm:text-6xl font-extrabold leading-tight">
+            <h2 className="mt-4 font-extrabold leading-tight" style={{ fontSize: 'clamp(2.5rem, 5vw, 5rem)' }}>
               {current.name}
             </h2>
 
-            <div className="mt-5 flex flex-wrap gap-2 text-sm sm:text-base">
+            <div className="mt-5 flex flex-wrap gap-2" style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1.125rem)' }}>
               <span className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-950/60 border border-slate-800">
                 <Calendar className="w-4 h-4 text-indigo-300" />
                 {released}
@@ -90,11 +90,10 @@ export default function HeroSlider({ items = [] }) {
             <button
               key={idx}
               onClick={() => setI(idx)}
-              className={`h-2.5 rounded-full transition border ${
-                idx === i
+              className={`h-2.5 rounded-full transition border ${idx === i
                   ? "w-10 bg-indigo-400 border-indigo-300"
                   : "w-2.5 bg-slate-700/60 border-slate-600"
-              }`}
+                }`}
               aria-label={`Ir a slide ${idx + 1}`}
             />
           ))}

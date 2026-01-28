@@ -79,19 +79,19 @@ export default function Home() {
 
       {/* SECCIÓN PROMOCIONAL */}
       <section className="py-24 border-b border-slate-800">
-        <div className="max-w-6xl mx-auto px-4 grid gap-14 lg:grid-cols-2 items-center">
+        <div className="max-w-7xl mx-auto px-4 grid gap-14 lg:grid-cols-2 items-center">
           <div>
-            <p className="text-sm text-indigo-400 font-semibold uppercase tracking-wide">
+            <p className="text-indigo-400 font-semibold uppercase tracking-wide" style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)' }}>
               Plataforma de videojuegos
             </p>
 
-            <h1 className="mt-4 text-4xl sm:text-5xl font-extrabold leading-tight">
+            <h1 className="mt-4 font-extrabold leading-tight" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)' }}>
               Descubre, busca y explora
               <br />
               los mejores videojuegos
             </h1>
 
-            <p className="mt-6 text-lg text-slate-300">
+            <p className="mt-6 text-slate-300" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}>
               Accede a una base de datos completa de videojuegos, consulta
               valoraciones, fechas de lanzamiento y descubre títulos destacados
               de todas las plataformas.

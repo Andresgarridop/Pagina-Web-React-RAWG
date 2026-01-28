@@ -116,7 +116,7 @@ export default function GameDetail() {
 
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-950/35" />
 
-          <div className="relative max-w-6xl mx-auto px-4 pt-10 pb-10 min-h-[62vh]">
+          <div className="relative max-w-7xl mx-auto px-4 pt-10 pb-10 min-h-[62vh]">
             {/* BACK arriba */}
             <div className="flex items-center justify-between">
               <Button to="/games" className="text-sm">
@@ -128,12 +128,12 @@ export default function GameDetail() {
             {/* Contenido principal */}
             <div className="mt-10 grid gap-8 lg:grid-cols-12 items-end">
               <div className="lg:col-span-8">
-                <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight">
+                <h1 className="font-extrabold tracking-tight" style={{ fontSize: 'clamp(2rem, 5vw, 5rem)' }}>
                   {game.name}
                 </h1>
 
                 {/* Chips */}
-                <div className="mt-6 flex flex-wrap items-center gap-2 text-sm sm:text-base">
+                <div className="mt-6 flex flex-wrap items-center gap-2" style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1.125rem)' }}>
                   <Badge icon={Calendar}>{released}</Badge>
                   <Badge icon={Star}>{rating}</Badge>
                   <Badge icon={Trophy}>Metacritic: {meta}</Badge>
@@ -203,11 +203,11 @@ export default function GameDetail() {
       </section>
 
       {/* CONTENIDO */}
-      <section className="max-w-6xl mx-auto px-4 py-12 grid gap-8 lg:grid-cols-12">
+      <section className="max-w-7xl mx-auto px-4 py-12 grid gap-8 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <Card>
-            <h2 className="text-xl font-bold">Descripción</h2>
-            <p className="mt-4 text-slate-300 leading-relaxed whitespace-pre-line">
+            <h2 className="font-bold" style={{ fontSize: 'clamp(1.25rem, 2vw, 1.75rem)' }}>Descripción</h2>
+            <p className="mt-4 text-slate-300 leading-relaxed whitespace-pre-line" style={{ fontSize: 'clamp(0.875rem, 1.1vw, 1.125rem)' }}>
               {description || "No hay descripción disponible para este juego."}
             </p>
           </Card>
