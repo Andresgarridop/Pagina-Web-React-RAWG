@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import { Gamepad2 } from "lucide-react";
 
 function Item({ to, children }) {
@@ -6,10 +6,9 @@ function Item({ to, children }) {
     <NavLink
       to={to}
       className={({ isActive }) =>
-        `px-3 py-2 rounded-xl text-sm transition border ${
-          isActive
-            ? "bg-slate-800 border-slate-700 text-white"
-            : "bg-slate-900/40 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white"
+        `px-3 py-2 rounded-xl text-sm transition border ${isActive
+          ? "bg-slate-800 border-slate-700 text-white"
+          : "bg-slate-900/40 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white"
         }`
       }
     >
