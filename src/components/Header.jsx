@@ -39,6 +39,7 @@ export default function Header() {
         <nav className="flex items-center gap-2">
           <Item to="/">Inicio</Item>
           <Item to="/games">Videojuegos</Item>
+          <Item to="/publishers">Desarrolladoras</Item>
         </nav>
       </div>
     </header>

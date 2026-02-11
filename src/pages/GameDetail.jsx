@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router";
 import {
   ArrowLeft,
   Calendar,
@@ -8,6 +9,7 @@ import {
   Trophy,
   Heart,
   ExternalLink,
+  Building2,
 } from "lucide-react";
 
 import Badge from "../components/ui/Badge";
@@ -61,9 +63,11 @@ export default function GameDetail() {
     };
   }, [id]);
 
-  const genres = useMemo(() => game?.genres?.map((g) => g.name) || [], [game]);
+  const genres = useMemo(() => game?.genres || [], [game]);
+  const tags = useMemo(() => game?.tags || [], [game]);
+  const publishers = useMemo(() => game?.publishers || [], [game]);
   const platforms = useMemo(
-    () => game?.platforms?.map((p) => p.platform?.name).filter(Boolean) || [],
+    () => game?.platforms || [],
     [game]
   );
 
@@ -139,7 +143,7 @@ export default function GameDetail() {
                   <Badge icon={Trophy}>Metacritic: {meta}</Badge>
                 </div>
 
-                {/* Acciones (aquí encaja perfecto favoritos) */}
+                {/* Acciones */}
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                   <button
                     onClick={handleToggleFav}
@@ -147,8 +151,6 @@ export default function GameDetail() {
                       ? "bg-pink-500/20 border-pink-400 text-pink-300 hover:bg-pink-500/25"
                       : "bg-slate-950/40 border-slate-800 text-slate-200 hover:bg-slate-900"
                       }`}
-                    aria-label={fav ? "Quitar de favoritos" : "Añadir a favoritos"}
-                    title={fav ? "Quitar de favoritos" : "Añadir a favoritos"}
                   >
                     <Heart className={`w-5 h-5 ${fav ? "fill-current" : ""}`} />
                     {fav ? "En favoritos" : "Añadir a favoritos"}
@@ -162,19 +164,21 @@ export default function GameDetail() {
                   )}
                 </div>
 
-                {/* Géneros */}
+                {/* Géneros Clickables */}
                 {genres.length > 0 && (
                   <div className="mt-6 flex flex-wrap gap-2">
                     {genres.map((g) => (
-                      <Badge key={g} icon={Tag} className="bg-slate-950/30">
-                        {g}
-                      </Badge>
+                      <Link key={g.id} to={`/games?genres=${g.slug}`}>
+                        <Badge icon={Tag} className="bg-slate-950/30 hover:bg-indigo-500/20 hover:border-indigo-500/30 transition-colors cursor-pointer">
+                          {g.name}
+                        </Badge>
+                      </Link>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* Tarjeta derecha */}
+              {/* Tarjeta derecha (Plataformas) */}
               <div className="lg:col-span-4 flex lg:justify-end">
                 <div className="w-full lg:w-auto rounded-3xl border border-slate-800 bg-slate-950/40 p-6">
                   {platforms.length > 0 && (
@@ -183,17 +187,16 @@ export default function GameDetail() {
                         <Monitor className="w-4 h-4 text-indigo-300" />
                         Plataformas
                       </p>
-                      <p className="mt-2 text-sm text-slate-400 leading-relaxed">
-                        {platforms.slice(0, 14).join(" · ")}
-                        {platforms.length > 14 ? " · …" : ""}
-                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {platforms.map((p) => (
+                          <Link key={p.platform.id} to={`/games?platforms=${p.platform.id}`}>
+                            <span className="text-xs bg-slate-900 border border-slate-800 px-2 py-1 rounded-lg text-slate-400 hover:text-indigo-300 hover:border-indigo-500/30 transition-colors">
+                              {p.platform.name}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  )}
-
-                  {!game.website && (
-                    <p className="mt-4 text-sm text-slate-500">
-                      Este título no tiene web oficial disponible.
-                    </p>
                   )}
                 </div>
               </div>
@@ -204,46 +207,76 @@ export default function GameDetail() {
 
       {/* CONTENIDO */}
       <section className="max-w-7xl mx-auto px-4 py-12 grid gap-8 lg:grid-cols-12">
-        <div className="lg:col-span-8">
+        <div className="lg:col-span-8 space-y-8">
           <Card>
             <h2 className="font-bold" style={{ fontSize: 'clamp(1.25rem, 2vw, 1.75rem)' }}>Descripción</h2>
             <p className="mt-4 text-slate-300 leading-relaxed whitespace-pre-line" style={{ fontSize: 'clamp(0.875rem, 1.1vw, 1.125rem)' }}>
               {description || "No hay descripción disponible para este juego."}
             </p>
           </Card>
+
+          {/* Tags Section */}
+          {tags.length > 0 && (
+            <Card>
+              <h2 className="text-xl font-bold mb-4">Etiquetas</h2>
+              <div className="flex flex-wrap gap-2">
+                {tags.map((t) => (
+                  <Link key={t.id} to={`/games?tags=${t.slug}`}>
+                    <span className="text-xs bg-slate-900/50 border border-slate-800 px-3 py-1.5 rounded-full text-slate-400 hover:text-indigo-300 hover:border-indigo-500/30 transition-colors">
+                      #{t.name}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </Card>
+          )}
         </div>
 
-        <div className="lg:col-span-4">
+        <div className="lg:col-span-4 space-y-6">
           <Card>
             <h2 className="text-xl font-bold">Detalles</h2>
-
             <div className="mt-5 space-y-4 text-sm text-slate-300">
               <div className="flex items-center justify-between gap-4">
                 <span className="text-slate-400">Fecha</span>
                 <span className="font-semibold text-slate-200">{released}</span>
               </div>
-
               <div className="flex items-center justify-between gap-4">
                 <span className="text-slate-400">Rating</span>
                 <span className="font-semibold text-slate-200">{rating}</span>
               </div>
-
               <div className="flex items-center justify-between gap-4">
                 <span className="text-slate-400">Metacritic</span>
                 <span className="font-semibold text-slate-200">{meta}</span>
               </div>
-
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-slate-400">Actualizado</span>
-                <span className="font-semibold text-slate-200">
-                  {game.updated ? game.updated.slice(0, 10) : "—"}
-                </span>
-              </div>
             </div>
           </Card>
 
+          {/* Publishers Section */}
+          {publishers.length > 0 && (
+            <Card>
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-indigo-400" />
+                Publishers
+              </h2>
+              <div className="mt-4 space-y-2">
+                {publishers.map((pub) => (
+                  <Link
+                    key={pub.id}
+                    to={`/publishers/${pub.id}`}
+                    className="block p-3 rounded-xl border border-slate-800 bg-slate-900/30 hover:bg-slate-800/50 hover:border-indigo-500/30 transition-all group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-slate-200 group-hover:text-indigo-300">{pub.name}</span>
+                      <ArrowLeft className="w-4 h-4 rotate-180 text-slate-500 group-hover:text-indigo-400" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </Card>
+          )}
+
           {game.esrb_rating?.name && (
-            <Card className="mt-6">
+            <Card>
               <h2 className="text-xl font-bold">Clasificación</h2>
               <p className="mt-4 text-slate-300">{game.esrb_rating.name}</p>
             </Card>
