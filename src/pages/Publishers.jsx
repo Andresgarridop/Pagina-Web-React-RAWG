@@ -110,23 +110,32 @@ export default function Publishers() {
                             to={`/publishers/${pub.id}`}
                             className="group relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/40 hover:bg-slate-800/60 transition-all p-6 flex flex-col justify-between min-h-[160px]"
                         >
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <Building2 className="w-20 h-20 -mr-4 -mt-4 text-white" />
-                            </div>
-
-                            <div>
-                                <h3 className="text-xl font-bold text-slate-100 group-hover:text-indigo-300 transition-colors">
-                                    {pub.name}
-                                </h3>
-                                <div className="mt-2 flex items-center gap-2 text-sm text-slate-400">
-                                    <Gamepad2 className="w-4 h-4" />
-                                    <span>{pub.games_count} videojuegos</span>
+                            {pub.image_background && (
+                                <div className="absolute inset-0 z-0">
+                                    <img
+                                        src={pub.image_background}
+                                        alt=""
+                                        className="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity duration-500"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent" />
                                 </div>
-                            </div>
+                            )}
 
-                            <div className="mt-4 flex items-center justify-between">
-                                <span className="text-xs text-indigo-400 font-semibold uppercase tracking-wider">Ver detalles</span>
-                                <ArrowRight className="w-5 h-5 text-indigo-400 group-hover:translate-x-1 transition-transform" />
+                            <div className="relative z-10 flex flex-col justify-between h-full">
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-100 group-hover:text-indigo-300 transition-colors">
+                                        {pub.name}
+                                    </h3>
+                                    <div className="mt-2 flex items-center gap-2 text-sm text-slate-400">
+                                        <Gamepad2 className="w-4 h-4" />
+                                        <span>{pub.games_count} videojuegos</span>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 flex items-center justify-between">
+                                    <span className="text-xs text-indigo-400 font-semibold uppercase tracking-wider">Ver detalles</span>
+                                    <ArrowRight className="w-5 h-5 text-indigo-400 group-hover:translate-x-1 transition-transform" />
+                                </div>
                             </div>
                         </Link>
                     ))}

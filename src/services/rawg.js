@@ -61,12 +61,6 @@ export function getGameDetails(id) {
 
 /* -------------------------------------------------------
    /GAMES: listado paginado + filtros
-   page_size recomendado: 40
-   ordering: "-rating" | "-metacritic" | "-added" | "-released" | "name" ...
-   genres: slug (ej: "action", "rpg")
-   platforms: id (ej: "4" para PC)
-   dates: "YYYY-MM-DD,YYYY-MM-DD"
-   metacritic: "80,100"
 ------------------------------------------------------- */
 export function getGamesList({
   page = 1,
