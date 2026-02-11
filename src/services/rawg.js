@@ -75,6 +75,8 @@ export function getGamesList({
   ordering = "",
   genres = "",
   platforms = "",
+  tags = "",
+  publishers = "",
   dates = "",
   metacritic = "",
 } = {}) {
@@ -85,6 +87,8 @@ export function getGamesList({
     ordering,
     genres,
     platforms,
+    tags,
+    publishers,
     dates,
     metacritic,
   });
@@ -103,4 +107,16 @@ export function getPlatforms({ page = 1, pageSize = 40 } = {}) {
     page,
     page_size: pageSize,
   });
+}
+
+export function getPublishersList({ page = 1, pageSize = 20, search = "" } = {}) {
+  return request("/publishers", {
+    page,
+    page_size: pageSize,
+    search,
+  });
+}
+
+export function getPublisherDetails(id) {
+  return request(`/publishers/${id}`);
 }
