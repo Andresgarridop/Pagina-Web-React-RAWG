@@ -47,7 +47,7 @@ export default function MyEvents() {
                                     </div>
                                     <div className="flex items-center gap-1.5 text-slate-400 text-sm">
                                         <Calendar className="w-4 h-4 text-purple-400" />
-                                        <span>Confirmado</span>
+                                        <span>{event.date}</span>
                                     </div>
                                 </div>
                             </div>

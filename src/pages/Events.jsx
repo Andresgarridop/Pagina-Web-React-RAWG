@@ -62,15 +62,15 @@ export default function Events() {
                                 </div>
                                 <div className="flex items-center gap-2 text-slate-400 text-sm">
                                     <Calendar className="w-4 h-4 text-purple-400" />
-                                    <span>Próximamente 2025</span>
+                                    <span>{event.date}</span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={() => dispatch(toggleEventParticipation(event))}
                                 className={`w-full py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${isJoined(event.id)
-                                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
-                                        : "bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20"
+                                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
+                                    : "bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20"
                                     }`}
                             >
                                 {isJoined(event.id) ? (
