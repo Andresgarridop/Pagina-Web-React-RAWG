@@ -73,7 +73,7 @@ export default function Publishers() {
         <div className="max-w-6xl mx-auto px-4 py-12">
             <div className="flex flex-col gap-8">
                 <div>
-                    <h1 className="text-4xl font-extrabold flex items-center gap-3">
+                    <h1 className="text-4xl font-extrabold flex items-center gap-3 bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">
                         <Building2 className="w-10 h-10 text-indigo-400" />
                         Desarrolladoras
                     </h1>
