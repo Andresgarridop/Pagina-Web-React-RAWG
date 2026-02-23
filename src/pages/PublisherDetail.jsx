@@ -6,7 +6,7 @@ import ErrorMessage from "../components/ui/ErrorMessage";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import GameCard from "../components/GameCard";
-import { getPublisherDetails, getGamesList } from "../services/rawg";
+import { getPublisherDetails, getGamesList } from "../services/service";
 
 export default function PublisherDetail() {
     const { id } = useParams();

@@ -4,7 +4,7 @@ import { Building2, Search, ArrowRight, Gamepad2 } from "lucide-react";
 import Loading from "../components/ui/Loading";
 import ErrorMessage from "../components/ui/ErrorMessage";
 import Pagination from "../components/Pagination";
-import { getPublishersList } from "../services/rawg";
+import { getPublishersList } from "../services/service";
 
 const PAGE_SIZE = 20;
 

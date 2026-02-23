@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router";
+import { useEffect, useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   ArrowLeft,
   Calendar,
@@ -17,59 +18,28 @@ import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import Loading from "../components/ui/Loading";
 import ErrorMessage from "../components/ui/ErrorMessage";
-import { getGameDetails } from "../services/rawg";
-import { isFavorite, toggleFavorite } from "../services/favorites";
+import { fetchGameDetails } from "../slices/gamesThunks";
+import { toggleFavorite } from "../slices/gamesSlice";
 
 function stripHtml(html = "") {
   return html.replace(/<[^>]*>/g, "").trim();
 }
 
 export default function GameDetail() {
-  const id = window.location.pathname.split("/").pop();
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const { details: game, isLoading, error, favorites } = useSelector((state) => state.games);
 
-  const [game, setGame] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const [fav, setFav] = useState(false);
+  const isFav = useMemo(() => favorites.some((f) => String(f.id) === String(id)), [favorites, id]);
 
   useEffect(() => {
-    setFav(isFavorite(id));
-  }, [id]);
-
-  useEffect(() => {
-    let alive = true;
-
-    (async () => {
-      try {
-        setLoading(true);
-        setError("");
-
-        const data = await getGameDetails(id);
-        if (!alive) return;
-
-        setGame(data);
-      } catch (e) {
-        if (!alive) return;
-        setError(e.message || "No se pudo cargar el videojuego.");
-      } finally {
-        if (!alive) return;
-        setLoading(false);
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, [id]);
+    dispatch(fetchGameDetails(id));
+  }, [id, dispatch]);
 
   const genres = useMemo(() => game?.genres || [], [game]);
   const tags = useMemo(() => game?.tags || [], [game]);
   const publishers = useMemo(() => game?.publishers || [], [game]);
-  const platforms = useMemo(
-    () => game?.platforms || [],
-    [game]
-  );
+  const platforms = useMemo(() => game?.platforms || [], [game]);
 
   const rating = game?.rating ? game.rating.toFixed(1) : "—";
   const meta = game?.metacritic ?? "—";
@@ -81,11 +51,10 @@ export default function GameDetail() {
   }, [game]);
 
   const handleToggleFav = () => {
-    const nowFav = toggleFavorite(id);
-    setFav(nowFav);
+    dispatch(toggleFavorite(game));
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-12">
         <Loading message="Cargando videojuego…" />
@@ -147,13 +116,13 @@ export default function GameDetail() {
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                   <button
                     onClick={handleToggleFav}
-                    className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl border transition text-sm font-semibold ${fav
+                    className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl border transition text-sm font-semibold ${isFav
                       ? "bg-pink-500/20 border-pink-400 text-pink-300 hover:bg-pink-500/25"
                       : "bg-slate-950/40 border-slate-800 text-slate-200 hover:bg-slate-900"
                       }`}
                   >
-                    <Heart className={`w-5 h-5 ${fav ? "fill-current" : ""}`} />
-                    {fav ? "En favoritos" : "Añadir a favoritos"}
+                    <Heart className={`w-5 h-5 ${isFav ? "fill-current" : ""}`} />
+                    {isFav ? "En favoritos" : "Añadir a favoritos"}
                   </button>
 
                   {game.website && (

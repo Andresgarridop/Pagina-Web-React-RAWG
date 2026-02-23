@@ -7,11 +7,14 @@ import Games from "./pages/Games";
 import GameDetail from "./pages/GameDetail";
 import Publishers from "./pages/Publishers";
 import PublisherDetail from "./pages/PublisherDetail";
+import Events from "./pages/Events";
+import MyFavorites from "./pages/MyFavorites";
+import MyEvents from "./pages/MyEvents";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30">
       <Header />
 
       <main className="flex-1">
@@ -19,6 +22,9 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/games" element={<Games />} />
           <Route path="/games/:id" element={<GameDetail />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/my-favorites" element={<MyFavorites />} />
+          <Route path="/my-events" element={<MyEvents />} />
           <Route path="/publishers" element={<Publishers />} />
           <Route path="/publishers/:id" element={<PublisherDetail />} />
           <Route path="*" element={<NotFound />} />

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Star, Search, Calendar, Info } from "lucide-react";
 
 import Carousel from "../components/Carousel";
@@ -6,75 +7,26 @@ import HeroSlider from "../components/HeroSlider";
 import Button from "../components/ui/Button";
 import Loading from "../components/ui/Loading";
 import ErrorMessage from "../components/ui/ErrorMessage";
-import { getPopularGames, getTopMetacriticGames } from "../services/rawg";
+import { fetchPopularGames, fetchTopMetacriticGames } from "../slices/gamesThunks";
 
 export default function Home() {
-  const [heroGames, setHeroGames] = useState([]);
-  const [popular, setPopular] = useState([]);
-
-  const [loadingHero, setLoadingHero] = useState(true);
-  const [loadingPopular, setLoadingPopular] = useState(true);
-
-  const [errorHero, setErrorHero] = useState("");
-  const [errorPopular, setErrorPopular] = useState("");
+  const dispatch = useDispatch();
+  const { popular, metacritic, isLoading, error } = useSelector((state) => state.games);
 
   useEffect(() => {
-    let alive = true;
-
-    (async () => {
-      try {
-        setLoadingHero(true);
-        setErrorHero("");
-        const data = await getTopMetacriticGames({ pageSize: 8 });
-        if (!alive) return;
-        setHeroGames(data.results || []);
-      } catch {
-        if (!alive) return;
-        setErrorHero("No se pudo cargar el slider de videojuegos destacados.");
-      } finally {
-        if (!alive) return;
-        setLoadingHero(false);
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let alive = true;
-
-    (async () => {
-      try {
-        setLoadingPopular(true);
-        setErrorPopular("");
-        const data = await getPopularGames({ pageSize: 12 });
-        if (!alive) return;
-        setPopular(data.results || []);
-      } catch {
-        if (!alive) return;
-        setErrorPopular("No se pudieron cargar los videojuegos populares.");
-      } finally {
-        if (!alive) return;
-        setLoadingPopular(false);
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, []);
+    dispatch(fetchTopMetacriticGames({ pageSize: 8 }));
+    dispatch(fetchPopularGames({ pageSize: 12 }));
+  }, [dispatch]);
 
   return (
     <div>
       {/* HERO SLIDER */}
-      {loadingHero && <Loading message="Cargando videojuegos destacados…" />}
+      {isLoading && metacritic.length === 0 && <Loading message="Cargando videojuegos destacados…" />}
 
-      {errorHero && <ErrorMessage message={errorHero} />}
+      {error && <ErrorMessage message={error} />}
 
-      {!loadingHero && !errorHero && (
-        <HeroSlider items={heroGames} />
+      {metacritic.length > 0 && (
+        <HeroSlider items={metacritic} />
       )}
 
       {/* SECCIÓN PROMOCIONAL */}
@@ -128,11 +80,9 @@ export default function Home() {
       </section>
 
       {/* CARRUSEL DE POPULARES */}
-      {loadingPopular && <Loading message="Cargando videojuegos populares…" />}
+      {isLoading && popular.length === 0 && <Loading message="Cargando videojuegos populares…" />}
 
-      {errorPopular && <ErrorMessage message={errorPopular} />}
-
-      {!loadingPopular && !errorPopular && (
+      {popular.length > 0 && (
         <Carousel
           title="Videojuegos más populares"
           items={popular}

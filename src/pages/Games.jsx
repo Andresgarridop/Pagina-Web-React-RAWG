@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
 import GameCard from "../components/GameCard";
 import GameFilters from "../components/GameFilters";
 import Pagination from "../components/Pagination";
 import Loading from "../components/ui/Loading";
 import ErrorMessage from "../components/ui/ErrorMessage";
-import { getGamesList, getGenres, getPlatforms } from "../services/rawg";
+import { fetchGamesList, fetchFilterData } from "../slices/gamesThunks";
 
 const PAGE_SIZE = 40;
 
@@ -19,9 +20,10 @@ const ORDER_OPTIONS = [
 ];
 
 export default function Games() {
+    const dispatch = useDispatch();
     const [searchParams, setSearchParams] = useSearchParams();
+    const { list: games, count, genres, platforms, isLoading, error } = useSelector((state) => state.games);
 
-    // Sincronizamos input local con lo que hay en la URL para el buscador (opcional, pero mejor experiencia)
     const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
 
     const page = parseInt(searchParams.get("page") || "1", 10);
@@ -32,17 +34,7 @@ export default function Games() {
     const tag = searchParams.get("tags") || "";
     const publisher = searchParams.get("publishers") || "";
 
-    const [games, setGames] = useState([]);
-    const [count, setCount] = useState(0);
-
-    const [genres, setGenres] = useState([]);
-    const [platforms, setPlatforms] = useState([]);
-
-    const [loading, setLoading] = useState(true);
-    const [loadingFilters, setLoadingFilters] = useState(true);
-    const [error, setError] = useState("");
-
-    // Debounce del buscador (actualiza la URL)
+    // Debounce del buscador
     useEffect(() => {
         const t = setTimeout(() => {
             if (searchInput.trim() !== search) {
@@ -56,64 +48,27 @@ export default function Games() {
                 setSearchParams(newParams);
             }
         }, 450);
-
         return () => clearTimeout(t);
     }, [searchInput, search, searchParams, setSearchParams]);
 
     // Cargar listas de filtros una vez
     useEffect(() => {
-        let alive = true;
-        (async () => {
-            try {
-                setLoadingFilters(true);
-                const [g, p] = await Promise.all([getGenres(), getPlatforms()]);
-                if (!alive) return;
-                setGenres(g.results || []);
-                setPlatforms(p.results || []);
-            } catch {
-                if (!alive) return;
-            } finally {
-                if (!alive) return;
-                setLoadingFilters(false);
-            }
-        })();
-        return () => { alive = false; };
-    }, []);
+        dispatch(fetchFilterData());
+    }, [dispatch]);
 
-    // Cargar juegos cuando cambie la URL (searchParams)
+    // Cargar juegos cuando cambie la URL
     useEffect(() => {
-        let alive = true;
-        (async () => {
-            try {
-                setLoading(true);
-                setError("");
-
-                const data = await getGamesList({
-                    page,
-                    pageSize: PAGE_SIZE,
-                    search,
-                    ordering,
-                    genres: genre,
-                    platforms: platform,
-                    tags: tag,
-                    publishers: publisher
-                });
-
-                if (!alive) return;
-                setGames(data.results || []);
-                setCount(data.count || 0);
-            } catch (e) {
-                if (!alive) return;
-                setError(e.message || "Error cargando videojuegos");
-                setGames([]);
-                setCount(0);
-            } finally {
-                if (!alive) return;
-                setLoading(false);
-            }
-        })();
-        return () => { alive = false; };
-    }, [page, search, ordering, genre, platform, tag, publisher]);
+        dispatch(fetchGamesList({
+            page,
+            pageSize: PAGE_SIZE,
+            search,
+            ordering,
+            genres: genre,
+            platforms: platform,
+            tags: tag,
+            publishers: publisher
+        }));
+    }, [dispatch, page, search, ordering, genre, platform, tag, publisher]);
 
     const totalPages = useMemo(() => {
         if (!count) return 1;
@@ -146,7 +101,7 @@ export default function Games() {
         <div className="max-w-6xl mx-auto px-4 py-12">
             <div className="flex flex-col gap-8">
                 <div>
-                    <h1 className="text-4xl font-extrabold">
+                    <h1 className="text-4xl font-extrabold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
                         {tag ? `Juegos con etiqueta: ${tag}` :
                             publisher ? `Juegos de Publisher ID: ${publisher}` :
                                 "Explora Videojuegos"}
@@ -167,7 +122,7 @@ export default function Games() {
                     onPlatformChange={(v) => handleParamChange("platforms", v)}
                     genres={genres}
                     platforms={platforms}
-                    loadingFilters={loadingFilters}
+                    loadingFilters={isLoading && genres.length === 0}
                     onClearFilters={clearFilters}
                     count={count}
                     currentPage={page}
@@ -175,13 +130,13 @@ export default function Games() {
                     orderOptions={ORDER_OPTIONS}
                 />
 
-                {loading && <Loading message="Cargando videojuegos…" />}
+                {isLoading && games.length === 0 && <Loading message="Cargando videojuegos…" />}
                 {error && <ErrorMessage message={error} />}
-                {!loading && !error && games.length === 0 && (
+                {!isLoading && !error && games.length === 0 && (
                     <p className="text-slate-400">No hay resultados con esos filtros.</p>
                 )}
 
-                {!loading && !error && games.length > 0 && (
+                {!isLoading && !error && games.length > 0 && (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {games.map((g) => (
                             <GameCard key={g.id} game={g} />
@@ -189,7 +144,7 @@ export default function Games() {
                     </div>
                 )}
 
-                {!loading && !error && count > 0 && (
+                {!isLoading && !error && count > 0 && (
                     <Pagination
                         currentPage={page}
                         totalPages={totalPages}
